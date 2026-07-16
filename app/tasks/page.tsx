@@ -14,11 +14,10 @@ import {
 } from "@/lib/api";
 import { clearToken, isLoggedIn } from "@/lib/auth";
 import TaskModal from "@/components/TaskModal";
+import ChatbotWidget from "@/components/ChatbotWidget";
 
 const STATUSES: Task["status"][] = ["Todo", "In Progress", "Done"];
 
-// Tasks page that shows the task board, handles CRUD actions,
-// and protects the page by redirecting unauthenticated users.
 export default function TasksPage() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -28,7 +27,6 @@ export default function TasksPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  // Load tasks and user assignments from the backend.
   const loadData = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -44,7 +42,6 @@ export default function TasksPage() {
   }, []);
 
   useEffect(() => {
-    // Redirect to login when the user is not authenticated.
     if (!isLoggedIn()) {
       router.push("/login");
       return;
@@ -53,7 +50,6 @@ export default function TasksPage() {
   }, [router, loadData]);
 
   function handleLogout() {
-    // Clear the stored auth token and send the user back to login.
     clearToken();
     router.push("/login");
   }
@@ -71,9 +67,7 @@ export default function TasksPage() {
   async function handleStatusChange(task: Task, status: Task["status"]) {
     try {
       const updated = await updateTask(task.id_task, { status });
-      setTasks((prev) =>
-        prev.map((t) => (t.id_task === updated.id_task ? updated : t)),
-      );
+      setTasks((prev) => prev.map((t) => (t.id_task === updated.id_task ? updated : t)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal update status");
     }
@@ -90,13 +84,10 @@ export default function TasksPage() {
   }
 
   async function handleSave(payload: TaskInput) {
-    // Save a new task or update an existing one, then refresh the list.
     try {
       if (editingTask) {
         const updated = await updateTask(editingTask.id_task, payload);
-        setTasks((prev) =>
-          prev.map((t) => (t.id_task === updated.id_task ? updated : t)),
-        );
+        setTasks((prev) => prev.map((t) => (t.id_task === updated.id_task ? updated : t)));
       } else {
         const created = await createTask(payload);
         setTasks((prev) => [...prev, created]);
@@ -131,13 +122,9 @@ export default function TasksPage() {
         <div className="board-columns">
           {STATUSES.map((status) => (
             <section key={status} className="board-column">
-              <h2
-                className={`column-title status-${status.replace(/\s+/g, "-").toLowerCase()}`}
-              >
+              <h2 className={`column-title status-${status.replace(/\s+/g, "-").toLowerCase()}`}>
                 {status}
-                <span className="count">
-                  {tasks.filter((t) => t.status === status).length}
-                </span>
+                <span className="count">{tasks.filter((t) => t.status === status).length}</span>
               </h2>
 
               <div className="column-cards">
@@ -146,26 +133,18 @@ export default function TasksPage() {
                   .map((task) => (
                     <article key={task.id_task} className="task-card">
                       <h3>{task.title}</h3>
-                      {task.description && (
-                        <p className="task-desc">{task.description}</p>
-                      )}
+                      {task.description && <p className="task-desc">{task.description}</p>}
 
                       <dl className="task-meta">
                         <div>
                           <dt>Assignee</dt>
-                          <dd>
-                            {task.assignee
-                              ? task.assignee.name
-                              : "Belum ditugaskan"}
-                          </dd>
+                          <dd>{task.assignee ? task.assignee.name : "Belum ditugaskan"}</dd>
                         </div>
                         <div>
                           <dt>Deadline</dt>
                           <dd>
                             {task.deadline
-                              ? new Date(task.deadline).toLocaleDateString(
-                                  "id-ID",
-                                )
+                              ? new Date(task.deadline).toLocaleDateString("id-ID")
                               : "-"}
                           </dd>
                         </div>
@@ -175,10 +154,7 @@ export default function TasksPage() {
                         <select
                           value={task.status}
                           onChange={(e) =>
-                            handleStatusChange(
-                              task,
-                              e.target.value as Task["status"],
-                            )
+                            handleStatusChange(task, e.target.value as Task["status"])
                           }
                         >
                           {STATUSES.map((s) => (
@@ -187,16 +163,10 @@ export default function TasksPage() {
                             </option>
                           ))}
                         </select>
-                        <button
-                          className="link"
-                          onClick={() => openEditModal(task)}
-                        >
+                        <button className="link" onClick={() => openEditModal(task)}>
                           Edit
                         </button>
-                        <button
-                          className="link danger"
-                          onClick={() => handleDelete(task)}
-                        >
+                        <button className="link danger" onClick={() => handleDelete(task)}>
                           Hapus
                         </button>
                       </div>
@@ -220,6 +190,8 @@ export default function TasksPage() {
           onSave={handleSave}
         />
       )}
+
+      <ChatbotWidget />
     </main>
   );
 }

@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation";
 import { login } from "@/lib/api";
 import { saveToken } from "@/lib/auth";
 
-// Login page for the task management app.
-// Handles user input, communicates with the authentication API,
-// saves the returned token, and navigates to the tasks page.
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("aron@example.com");
@@ -35,11 +32,8 @@ export default function LoginPage() {
       <div className="auth-card">
         <span className="eyebrow">Task Board</span>
         <h1>Masuk ke akun kamu</h1>
-        <p className="auth-sub">
-          Kelola task tim, satu papan untuk semua status.
-        </p>
+        <p className="auth-sub">Kelola task tim, satu papan untuk semua status.</p>
 
-        {/* Form login yang mengirimkan email dan password ke backend */}
         <form onSubmit={handleSubmit} className="auth-form">
           <label>
             Email

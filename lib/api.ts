@@ -98,3 +98,10 @@ export async function deleteTask(id: number) {
     method: "DELETE",
   });
 }
+
+export async function askChatbot(question: string) {
+  return request<{ answer: string }>("/chatbot/ask", {
+    method: "POST",
+    body: JSON.stringify({ question }),
+  });
+}
